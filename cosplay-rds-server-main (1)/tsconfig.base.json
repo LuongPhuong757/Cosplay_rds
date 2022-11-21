@@ -1,0 +1,47 @@
+{
+  "compilerOptions": {
+    "baseUrl": "./src",
+    "target": "es6",
+    "lib": [
+      "esnext"
+    ],
+    "outDir": "./build",
+    "allowJs": true,
+    "declaration": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "isolatedModules": false,
+    "downlevelIteration": true,
+    "noFallthroughCasesInSwitch": false,
+    "experimentalDecorators": true,
+    "strictPropertyInitialization": false,
+    "emitDecoratorMetadata": true,
+    "typeRoots": [
+      "./src/types",
+      "./node_modules/@types"
+    ],
+    "paths": {
+      "@modules/*": ["modules/*"],
+      "@guards/*": ["guards/*"],
+      "@middlewares/*": ["middlewares/*"],
+      "@interceptors/*": ["interceptors/*"],
+      "@providers/*": ["providers/*"],
+      "@decorators/*": ["decorators/*"],
+      "@interfaces": ["interfaces/index"],
+      "@common/*": ["common/*"],
+      "@services/*": ["services/*"],
+      "@configs/*": ["configs/*"],
+      "@config": ["configs/index"],
+      "@core/*": ["core/*"],
+      "@jobs/*": ["jobs/*"]
+    }
+  },
+  "include": ["src/**/*.ts", "src/**/*.json"],
+  "exclude": ["src/__mocks__"]
+}

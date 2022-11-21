@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "COTTipNFTDistributionState" ALTER COLUMN "lowerCOT" SET DATA TYPE VARCHAR(256);

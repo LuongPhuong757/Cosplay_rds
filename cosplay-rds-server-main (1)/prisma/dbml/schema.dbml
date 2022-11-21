@@ -1,0 +1,538 @@
+//// ------------------------------------------------------
+//// THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+//// ------------------------------------------------------
+
+Table User {
+  id Int [pk, increment]
+  account String [unique, not null]
+  auth0Id String [unique, not null]
+  name String [not null]
+  icon String
+  profile String
+  website String
+  isBan Boolean [not null, default: false]
+  isCosplayer Boolean [not null, default: false]
+  snsInfo Json
+  membership Membership
+  superChats Superchat [not null]
+  comments Comment [not null]
+  posts Post [not null]
+  followedBy User [not null]
+  following User [not null]
+  blockedBy User [not null]
+  blocking User [not null]
+  userPrivate UserPrivate
+  sendNotification Notification [not null]
+  Fav Fav [not null]
+  tag Tag [not null]
+  Report Report [not null]
+  ReportDetail ReportDetail [not null]
+  UserProfileRanking UserProfileRanking
+  buyers Subscription [not null]
+  sellers Subscription [not null]
+  ownedNfts UserHasNFT [not null]
+  nftCampaigns NFTCampaign [not null]
+  nftPrivilegeOnUsers NFTPrivilegeOnUsers [not null]
+  manageOffice Office
+  belongOffice Office
+  manageOfficeId Int [unique]
+  belongOfficeId Int
+  officeRequests OfficeRequest [not null]
+  cotHistories CotHistory [not null]
+  cOTTipNFTDistributionState COTTipNFTDistributionState
+}
+
+Table Office {
+  id Int [pk, increment]
+  owner User
+  layers User [not null]
+  officeRequests OfficeRequest [not null]
+}
+
+Table OfficeRequest {
+  id Int [pk, increment]
+  office Office [not null]
+  officeId Int [not null]
+  layer User [not null]
+  layerId Int [not null]
+  status OfficeRequestStatus [not null]
+  created DateTime [default: `now()`, not null]
+  approvedAt DateTime
+  restructuredAt DateTime
+}
+
+Table UserPrivate {
+  id Int [pk, increment]
+  user User [not null]
+  userId Int [unique, not null]
+  stripeCustomerId String [unique]
+  email String
+  emailVerifyToken String [unique]
+  twitterAccessToken String
+  twitterRefreshToken String
+  twitterAccount String
+  twitterOAuthState String
+  twitterCodeVerifier String
+  phone String [unique]
+  gender Gender [not null, default: 'NONE']
+  birthday DateTime
+  publicAddress String
+  remainCot Float
+  receivedCot Float
+  totalCot Float
+  setting Json
+  readTime DateTime [default: `now()`, not null]
+}
+
+Table CotHistory {
+  id Int [pk, increment]
+  amount Float [not null]
+  user User
+  userId Int
+  created DateTime [default: `now()`, not null]
+}
+
+Table Subscription {
+  id Int [pk, increment]
+  stripeSubscriptionKey String [unique, not null]
+  status SUBSCRIPTION_STATUS [not null]
+  buyer User
+  seller User
+  buyerId Int
+  sellerId Int
+  created DateTime [default: `now()`, not null]
+  updated DateTime [not null]
+  membershipId Int [not null]
+}
+
+Table UserProfileRanking {
+  id Int [pk, increment]
+  user User [not null]
+  userId Int [unique, not null]
+  all Int
+  weekly Int
+  best Int
+}
+
+Table Notification {
+  id Int [pk, increment]
+  sender User [not null]
+  receivedId Int
+  infoType INFO_TYPE [not null]
+  senderId Int [not null]
+  postId Int
+  created DateTime [default: `now()`, not null]
+}
+
+Table Post {
+  id Int [pk, increment]
+  caption String
+  disclosureRange Int [not null, default: 2]
+  commentAble Int [not null, default: 1]
+  user User [not null]
+  hashtags HashTag [not null]
+  photos Photo [not null]
+  tags Tag [not null]
+  favs Fav [not null]
+  comments Comment [not null]
+  scoreLogs ScoreLog [not null]
+  reportDetail ReportDetail [not null]
+  userId Int [not null]
+  created DateTime [default: `now()`, not null]
+  updated DateTime [not null]
+}
+
+Table ScoreLog {
+  id Int [pk, increment]
+  userId Int [not null]
+  score Int [not null]
+  paymentIntentId String
+  post Post
+  postId Int
+  jpy Int
+  senderId Int
+  created DateTime [default: `now()`, not null]
+}
+
+Table Membership {
+  id Int [pk, increment]
+  stripeProductId String [not null]
+  stripePriceId String [not null]
+  user User [not null]
+  userId Int [unique, not null]
+  membershipPrice Price [not null]
+  priceId Int [unique, not null]
+  created DateTime [default: `now()`, not null]
+  updated DateTime [not null]
+}
+
+Table DistributedTimestamp {
+  id Int [pk, increment]
+  timestamp DateTime [not null]
+}
+
+Table Price {
+  id Int [pk, increment]
+  amount Int [not null]
+  currency String [not null]
+  jpy Int [not null]
+  superchat Superchat
+  membership Membership
+}
+
+Table Superchat {
+  id Int [pk, increment]
+  price Price [not null]
+  priceId Int [unique, not null]
+  user User [not null]
+  userId Int [not null]
+  comment Comment [not null]
+  commentId Int [unique, not null]
+  paymentIntentId String
+  NFTGacha NFTGacha [not null]
+}
+
+Table Comment {
+  id Int [pk, increment]
+  comment String
+  post Post [not null]
+  user User [not null]
+  replyId Int
+  replies Comment [not null]
+  replyComment Comment
+  superChat Superchat
+  postId Int [not null]
+  userId Int [not null]
+  superchatId Int
+  created DateTime [default: `now()`, not null]
+}
+
+Table Fav {
+  id Int [pk, increment]
+  post Post [not null]
+  user User [not null]
+  postId Int [not null]
+  userId Int [not null]
+}
+
+Table HashTag {
+  id Int [pk, increment]
+  name String [unique, not null]
+  posts Post [not null]
+}
+
+Table Photo {
+  id Int [pk, increment]
+  image String [not null]
+  post Post [not null]
+  postId Int [not null]
+}
+
+Table Event {
+  id Int [pk, increment]
+  name String [not null]
+  title String
+  description String [not null]
+  applicationMethod String
+  eventDetail String
+  note String
+  image String [not null]
+  link String [not null]
+  isContest Boolean [not null]
+  startDate DateTime [not null]
+  endDate DateTime [not null]
+  tag Tag
+}
+
+Table Banner {
+  id Int [pk, increment]
+  image String [not null]
+  link String [not null]
+  priority Int [not null]
+  created DateTime [default: `now()`, not null]
+  updated DateTime [not null]
+}
+
+Table Tag {
+  id Int [pk, increment]
+  user User
+  event Event
+  posts Post [not null]
+  userId Int
+  eventId Int [unique]
+}
+
+Table Report {
+  id Int [pk, increment]
+  sender User
+  senderId Int
+  reportDetail ReportDetail
+}
+
+Table ReportDetail {
+  id Int [pk, increment]
+  user User
+  post Post
+  report Report [not null]
+  comment String [not null]
+  created DateTime [default: `now()`, not null]
+  userId Int
+  postId Int
+  reportId Int [unique, not null]
+}
+
+Table NFT {
+  id Int [pk, increment]
+  address String
+  tokenID String [not null]
+  totalSupply Int [not null]
+  name String [not null]
+  image String [not null]
+  description String [not null]
+  campaign NFTCampaign
+  campaignId Int
+  rarity Int [not null]
+  userHasNfts UserHasNFT [not null]
+  nftGachas NFTGachaOnNFTs [not null]
+  nftPrivilegeOnNfts NFTPrivilegeOnNFTs [not null]
+}
+
+Table UserHasNFT {
+  id Int [pk, increment]
+  user User [not null]
+  userId Int [not null]
+  nft NFT [not null]
+  nftId Int [not null]
+  amount Int [not null]
+  shipped Int [not null]
+}
+
+Table NFTCampaign {
+  id Int [pk, increment]
+  title String
+  description String
+  user User [not null]
+  userId Int [not null]
+  start DateTime [not null]
+  end DateTime [not null]
+  contract String [not null]
+  emissionRateTable Json [not null]
+  nfts NFT [not null]
+  nftPrivileges NFTPrivilege [not null]
+}
+
+Table NFTGacha {
+  id Int [pk, increment]
+  superchat Superchat [not null]
+  superchatId Int [not null]
+  created DateTime [default: `now()`, not null]
+  nfts NFTGachaOnNFTs [not null]
+}
+
+Table NFTGachaOnNFTs {
+  nft NFT [not null]
+  nftId Int [not null]
+  nftGacha NFTGacha [not null]
+  nftGachaId Int [not null]
+  total Int [not null]
+
+  indexes {
+    (nftId, nftGachaId) [pk]
+  }
+}
+
+Table NFTPrivilege {
+  id Int [pk, increment]
+  title String [not null]
+  description String [not null]
+  expired DateTime [not null]
+  nftCampaign NFTCampaign
+  nftCampaignId Int
+  nfts NFTPrivilegeOnNFTs [not null]
+  emailBody String [not null]
+  limitExecutionTimes Int [not null]
+  nftPrivilegeOnUsers NFTPrivilegeOnUsers [not null]
+}
+
+Table NFTPrivilegeOnNFTs {
+  nft NFT [not null]
+  nftId Int [not null]
+  nftPrivilege NFTPrivilege [not null]
+  nftPrivilegeId Int [not null]
+  required Int [not null]
+
+  indexes {
+    (nftId, nftPrivilegeId) [pk]
+  }
+}
+
+Table NFTPrivilegeOnUsers {
+  user User [not null]
+  userId Int [not null]
+  nftPrivilege NFTPrivilege [not null]
+  nftPrivilegeId Int [not null]
+  executionTimes Int [not null]
+
+  indexes {
+    (userId, nftPrivilegeId) [pk]
+  }
+}
+
+Table COTTipNFTDistributionState {
+  targetCosplayer String [pk]
+  targetERC721 String [not null]
+  lowerCOT String [not null]
+  user User
+  userId Int
+}
+
+Table COTTipTriggerdTxHashes {
+  txHash String [pk]
+  nftDistributed Boolean [not null]
+}
+
+Table COTTipDistributionTriggerdTxHashes {
+  txHash String [pk]
+  postId Int [not null]
+  photoId Int [not null]
+}
+
+Table DepositNFTHistory {
+  txHash String [pk]
+}
+
+Table UserFollows {
+  followedbyId Int [ref: > User.id]
+  followingId Int [ref: > User.id]
+}
+
+Table UserBlocks {
+  blockedbyId Int [ref: > User.id]
+  blockingId Int [ref: > User.id]
+}
+
+Table HashTagToPost {
+  hashtagsId Int [ref: > HashTag.id]
+  postsId Int [ref: > Post.id]
+}
+
+Table PostToTag {
+  tagsId Int [ref: > Tag.id]
+  postsId Int [ref: > Post.id]
+}
+
+Enum OfficeRequestStatus {
+  REQUESTING
+  APPROVED
+  RESTRUCTURED
+}
+
+Enum Gender {
+  MALE
+  FEMALE
+  NONE
+}
+
+Enum SUBSCRIPTION_STATUS {
+  ACTIVE
+  PENDING
+  EXPIRED
+  CANCELED
+}
+
+Enum INFO_TYPE {
+  FAV
+  TAG
+  TAG_FAV
+  COMMENT
+  FOLLOW
+  SUPERCHAT
+  MEMBERSHIP_NEW_POST
+  MEMBERSHIP
+  MENTION
+  ANNOUNCEMENT
+}
+
+Ref: User.manageOfficeId - Office.id [delete: SetNull]
+
+Ref: User.belongOfficeId - Office.id [delete: SetNull]
+
+Ref: OfficeRequest.officeId > Office.id [delete: Cascade]
+
+Ref: OfficeRequest.layerId > User.id [delete: Cascade]
+
+Ref: UserPrivate.userId - User.id [delete: Cascade]
+
+Ref: CotHistory.userId > User.id [delete: SetNull]
+
+Ref: Subscription.buyerId > User.id [delete: SetNull]
+
+Ref: Subscription.sellerId > User.id [delete: SetNull]
+
+Ref: UserProfileRanking.userId - User.id [delete: Cascade]
+
+Ref: Notification.senderId > User.id [delete: Cascade]
+
+Ref: Post.userId > User.id [delete: Cascade]
+
+Ref: ScoreLog.postId > Post.id [delete: SetNull]
+
+Ref: Membership.userId - User.id [delete: Cascade]
+
+Ref: Membership.priceId - Price.id [delete: Cascade]
+
+Ref: Superchat.priceId - Price.id [delete: Cascade]
+
+Ref: Superchat.userId > User.id [delete: Cascade]
+
+Ref: Superchat.commentId - Comment.id [delete: Cascade]
+
+Ref: Comment.postId > Post.id [delete: Cascade]
+
+Ref: Comment.userId > User.id [delete: Cascade]
+
+Ref: Comment.replyId > Comment.id
+
+Ref: Fav.postId > Post.id [delete: Cascade]
+
+Ref: Fav.userId > User.id [delete: Cascade]
+
+Ref: Photo.postId > Post.id [delete: Cascade]
+
+Ref: Tag.userId > User.id [delete: SetNull]
+
+Ref: Tag.eventId - Event.id [delete: SetNull]
+
+Ref: Report.senderId > User.id [delete: SetNull]
+
+Ref: ReportDetail.userId > User.id [delete: SetNull]
+
+Ref: ReportDetail.postId > Post.id [delete: SetNull]
+
+Ref: ReportDetail.reportId - Report.id [delete: Cascade]
+
+Ref: NFT.campaignId > NFTCampaign.id [delete: SetNull]
+
+Ref: UserHasNFT.userId > User.id [delete: Cascade]
+
+Ref: UserHasNFT.nftId > NFT.id [delete: Cascade]
+
+Ref: NFTCampaign.userId > User.id [delete: Cascade]
+
+Ref: NFTGacha.superchatId > Superchat.id [delete: Cascade]
+
+Ref: NFTGachaOnNFTs.nftId > NFT.id [delete: Cascade]
+
+Ref: NFTGachaOnNFTs.nftGachaId > NFTGacha.id [delete: Cascade]
+
+Ref: NFTPrivilege.nftCampaignId > NFTCampaign.id [delete: SetNull]
+
+Ref: NFTPrivilegeOnNFTs.nftId > NFT.id [delete: Cascade]
+
+Ref: NFTPrivilegeOnNFTs.nftPrivilegeId > NFTPrivilege.id [delete: Cascade]
+
+Ref: NFTPrivilegeOnUsers.userId > User.id [delete: Cascade]
+
+Ref: NFTPrivilegeOnUsers.nftPrivilegeId > NFTPrivilege.id [delete: Cascade]
+
+Ref: COTTipNFTDistributionState.userId - User.id [delete: SetNull]

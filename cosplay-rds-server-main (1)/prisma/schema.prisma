@@ -1,0 +1,471 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["selectRelationCount", "interactiveTransactions"]
+}
+
+generator dbml {
+  provider = "prisma-dbml-generator"
+}
+
+// ユーザ
+model User {
+  id                         Int                         @id @default(autoincrement())
+  account                    String                      @unique @db.VarChar(64)
+  auth0Id                    String                      @unique
+  name                       String                      @db.VarChar(64)
+  icon                       String? // URL of icon image
+  profile                    String?                     @db.VarChar(512) // description of profile
+  website                    String?                     @db.VarChar(256)
+  isBan                      Boolean                     @default(false)
+  isCosplayer                Boolean                     @default(false)
+  snsInfo                    Json?
+  membership                 Membership?
+  superChats                 Superchat[]
+  comments                   Comment[]
+  posts                      Post[]
+  followedBy                 User[]                      @relation("UserFollows", references: [id])
+  following                  User[]                      @relation("UserFollows", references: [id])
+  blockedBy                  User[]                      @relation("UserBlocks", references: [id])
+  blocking                   User[]                      @relation("UserBlocks", references: [id])
+  userPrivate                UserPrivate?
+  sendNotification           Notification[]
+  Fav                        Fav[]
+  tag                        Tag[]
+  Report                     Report[]
+  ReportDetail               ReportDetail[]
+  UserProfileRanking         UserProfileRanking?
+  buyers                     Subscription[]              @relation("Buyer")
+  sellers                    Subscription[]              @relation("Seller")
+  ownedNfts                  UserHasNFT[]
+  nftCampaigns               NFTCampaign[] // NFTキャンペーンが開催されているとき対象の NFT Campaign を参照
+  nftPrivilegeOnUsers        NFTPrivilegeOnUsers[]
+  manageOffice               Office?                     @relation("Owner", fields: [manageOfficeId], references: [id])
+  belongOffice               Office?                     @relation("Layers", fields: [belongOfficeId], references: [id])
+  manageOfficeId             Int?                        @unique
+  belongOfficeId             Int?
+  officeRequests             OfficeRequest[]
+  cotHistories               CotHistory[]
+  cOTTipNFTDistributionState COTTipNFTDistributionState? // isUserTipNFTDistributeを管理するため
+}
+
+model Office {
+  id             Int             @id @default(autoincrement())
+  owner          User?           @relation("Owner")
+  layers         User[]          @relation("Layers")
+  officeRequests OfficeRequest[]
+}
+
+enum OfficeRequestStatus {
+  REQUESTING
+  APPROVED
+  RESTRUCTURED
+}
+
+model OfficeRequest {
+  id             Int                 @id @default(autoincrement())
+  office         Office              @relation(fields: [officeId], references: [id])
+  officeId       Int
+  layer          User                @relation(fields: [layerId], references: [id])
+  layerId        Int
+  status         OfficeRequestStatus
+  created        DateTime            @default(now())
+  approvedAt     DateTime?
+  restructuredAt DateTime?
+}
+
+enum Gender {
+  MALE
+  FEMALE
+  NONE // nothing setting
+}
+
+// ユーザのプライベート情報
+model UserPrivate {
+  id                  Int       @id @default(autoincrement())
+  user                User      @relation(fields: [userId], references: [id])
+  userId              Int       @unique
+  stripeCustomerId    String?   @unique
+  email               String?   @db.VarChar(64)
+  emailVerifyToken    String?   @unique @db.VarChar(128)
+  twitterAccessToken  String?
+  twitterRefreshToken String?
+  twitterAccount      String?
+  twitterOAuthState   String?
+  twitterCodeVerifier String?
+  phone               String?   @unique @db.VarChar(32)
+  gender              Gender    @default(NONE)
+  birthday            DateTime?
+  publicAddress       String?   @db.VarChar(64)
+  remainCot           Float? // 未送金の LP-COT の合計
+  receivedCot         Float? // 受け取った LP-COT の合計
+  totalCot            Float? // publicAddressに紐づくCOTのBalance
+  setting             Json?
+  readTime            DateTime  @default(now())
+}
+
+// LPCotのHistory情報
+model CotHistory {
+  id      Int      @id @default(autoincrement())
+  amount  Float // 取得したLP-COT
+  user    User?    @relation(fields: [userId], references: [id])
+  userId  Int?
+  created DateTime @default(now())
+}
+
+// メンバーシップのサブスクリプション登録情報
+model Subscription {
+  id                    Int                 @id @default(autoincrement())
+  stripeSubscriptionKey String              @unique
+  status                SUBSCRIPTION_STATUS
+  buyer                 User?               @relation("Buyer", fields: [buyerId], references: [id])
+  seller                User?               @relation("Seller", fields: [sellerId], references: [id])
+  buyerId               Int?
+  sellerId              Int?
+  created               DateTime            @default(now())
+  updated               DateTime            @updatedAt
+  membershipId          Int
+}
+
+enum SUBSCRIPTION_STATUS {
+  ACTIVE
+  PENDING
+  EXPIRED
+  CANCELED
+}
+
+// ユーザのランキング情報
+model UserProfileRanking {
+  id     Int  @id @default(autoincrement())
+  user   User @relation(fields: [userId], references: [id])
+  userId Int  @unique
+  all    Int?
+  weekly Int?
+  best   Int?
+}
+
+enum INFO_TYPE {
+  FAV
+  TAG
+  TAG_FAV
+  COMMENT
+  FOLLOW
+  SUPERCHAT
+  MEMBERSHIP_NEW_POST
+  MEMBERSHIP
+  MENTION
+  ANNOUNCEMENT
+}
+
+// 通知
+model Notification {
+  id         Int       @id @default(autoincrement())
+  sender     User      @relation(references: [id], fields: [senderId])
+  receivedId Int?
+  infoType   INFO_TYPE
+  senderId   Int
+  postId     Int?
+  created    DateTime  @default(now())
+}
+
+// 投稿
+model Post {
+  id              Int            @id @default(autoincrement())
+  caption         String?        @db.VarChar(512)
+  disclosureRange Int            @default(2) // 誰でも
+  commentAble     Int            @default(1) // コメント許可
+  user            User           @relation(references: [id], fields: [userId])
+  hashtags        HashTag[]
+  photos          Photo[]
+  tags            Tag[]
+  favs            Fav[]
+  comments        Comment[]
+  scoreLogs       ScoreLog[]
+  reportDetail    ReportDetail[]
+  userId          Int
+  created         DateTime       @default(now())
+  updated         DateTime       @updatedAt
+}
+
+// ポイントを取得するテーブル
+model ScoreLog {
+  id              Int      @id @default(autoincrement())
+  userId          Int
+  score           Int
+  paymentIntentId String?
+  post            Post?    @relation(references: [id], fields: [postId])
+  postId          Int?
+  jpy             Int? // スーパチャットおよびメンバーシップの料金の課金額
+  senderId        Int? // 送り主
+  created         DateTime @default(now())
+}
+
+// メンバーシップ情報
+model Membership {
+  id              Int      @id @default(autoincrement())
+  stripeProductId String
+  stripePriceId   String
+  user            User     @relation(fields: [userId], references: [id])
+  userId          Int      @unique
+  membershipPrice Price    @relation(references: [id], fields: [priceId])
+  priceId         Int      @unique
+  created         DateTime @default(now())
+  updated         DateTime @updatedAt
+}
+
+// 配布時間
+model DistributedTimestamp {
+  id        Int      @id @default(autoincrement())
+  timestamp DateTime
+}
+
+// 価格(スーパーチャットおよびメンバーシップの料金は、Priceテーブルを参照する)
+model Price {
+  id         Int         @id @default(autoincrement())
+  amount     Int
+  currency   String      @db.VarChar(8) // currency (usd/jpy/etc...)
+  jpy        Int // jpy建ての価格
+  superchat  Superchat? // スーパーチャットの価格を表す場合
+  membership Membership? // メンバーシップの料金の場合
+}
+
+// コメントに紐づくスーパーチャット
+model Superchat {
+  id              Int        @id @default(autoincrement())
+  price           Price      @relation(fields: [priceId], references: [id])
+  priceId         Int        @unique
+  user            User       @relation(fields: [userId], references: [id]) // スーパーチャットしたユーザ
+  userId          Int
+  comment         Comment    @relation(fields: [commentId], references: [id])
+  commentId       Int        @unique
+  paymentIntentId String? // Stripe決済のPaymentIntentId
+  NFTGacha        NFTGacha[]
+}
+
+// 投稿のコメント
+model Comment {
+  id           Int        @id @default(autoincrement())
+  comment      String?    @db.VarChar(256)
+  post         Post       @relation(references: [id], fields: [postId])
+  user         User       @relation(references: [id], fields: [userId])
+  replyId      Int?
+  replies      Comment[]  @relation("RepliesComments")
+  replyComment Comment?   @relation("RepliesComments", fields: [replyId], references: [id])
+  superChat    Superchat?
+  postId       Int
+  userId       Int
+  superchatId  Int?
+  created      DateTime   @default(now())
+}
+
+// 投稿へのお気に入り
+model Fav {
+  id     Int  @id @default(autoincrement())
+  post   Post @relation(references: [id], fields: [postId])
+  user   User @relation(references: [id], fields: [userId])
+  postId Int
+  userId Int
+}
+
+// ハッシュタグ
+model HashTag {
+  id    Int    @id @default(autoincrement())
+  name  String @unique @db.VarChar(64)
+  posts Post[]
+}
+
+// 投稿に紐づく画像・動画
+model Photo {
+  id     Int    @id @default(autoincrement())
+  image  String // link of image URL
+  post   Post   @relation(references: [id], fields: [postId])
+  postId Int
+}
+
+// イベント情報
+model Event {
+  id          Int      @id @default(autoincrement())
+  name        String   @db.VarChar(64) // nameはタグ検索に使用する
+  title       String?  @db.VarChar(256) // titleはフロントで表示する時に使用する
+  description String   @db.VarChar(1024)
+  applicationMethod     String?     @db.VarChar(2048)
+  eventDetail           String?     @db.VarChar(1024)
+  note        String?  @db.VarChar(1024)
+  image       String // link of image URL
+  link        String // external event site URL by tap on image.
+  isContest   Boolean // Is it show by ranking?
+  startDate   DateTime
+  endDate     DateTime
+  tag         Tag?
+}
+
+// バナー情報
+model Banner {
+  id       Int      @id @default(autoincrement())
+  image    String // link of image URL.
+  link     String // Bannerをクリックすると遷移させる。
+  priority Int // 最もPriorityが高いBannerのリストを返す。
+  created  DateTime @default(now())
+  updated  DateTime @updatedAt
+}
+
+// ユーザと投稿のどちらか一方に紐づくタグ
+model Tag {
+  id      Int    @id @default(autoincrement())
+  user    User?  @relation(references: [id], fields: [userId])
+  event   Event? @relation(references: [id], fields: [eventId])
+  posts   Post[]
+  userId  Int?
+  eventId Int?   @unique
+}
+
+// 通報
+model Report {
+  id           Int           @id @default(autoincrement())
+  sender       User?         @relation(references: [id], fields: [senderId])
+  senderId     Int?
+  reportDetail ReportDetail?
+}
+
+// 通報の詳細情報
+model ReportDetail {
+  id       Int      @id @default(autoincrement())
+  user     User?    @relation(references: [id], fields: [userId])
+  post     Post?    @relation(references: [id], fields: [postId])
+  report   Report   @relation(references: [id], fields: [reportId])
+  comment  String   @db.VarChar(512)
+  created  DateTime @default(now())
+  userId   Int?
+  postId   Int?
+  reportId Int      @unique
+}
+
+// NFT情報
+model NFT {
+  id                 Int                  @id @default(autoincrement())
+  address            String? // NFTのアドレス
+  tokenID            String // NFT の ID
+  totalSupply        Int // NFT[ID] の供給量
+  // 以下3点 tokenURI の参照先のJSON ([https://eips.ethereum.org/EIPS/eip-721](https://eips.ethereum.org/EIPS/eip-721)) // 同じNFTを複数個発行できる
+  name               String // NFT の名前
+  image              String // NFT の画像URL
+  description        String // NFT の説明
+  campaign           NFTCampaign?         @relation(references: [id], fields: [campaignId])
+  campaignId         Int?
+  rarity             Int // レアリティ
+  userHasNfts        UserHasNFT[]
+  nftGachas          NFTGachaOnNFTs[]
+  nftPrivilegeOnNfts NFTPrivilegeOnNFTs[]
+}
+
+// ユーザとNFTの結びける情報
+model UserHasNFT {
+  id      Int  @id @default(autoincrement())
+  user    User @relation(references: [id], fields: [userId]) // 所有者のCureアカウント
+  userId  Int
+  nft     NFT  @relation(references: [id], fields: [nftId]) // 保有してるNFT
+  nftId   Int
+  amount  Int // この NFT をユーザはいくつ持っているか
+  shipped Int // 出庫済みの個数(常に amount >= shipped)
+}
+
+// NFTのキャンペーン情報
+model NFTCampaign {
+  id                Int            @id @default(autoincrement())
+  title             String?
+  description       String?
+  user              User           @relation(references: [id], fields: [userId]) // NFTキャンペーン対象のユーザID
+  userId            Int
+  start             DateTime // キャンペーンの開始日時
+  end               DateTime // キャンペーンの終了日時
+  contract          String // NFT のコントラクトアドレス
+  emissionRateTable Json //　排出率テーブルを持つ。{ "1": 60, "2": 20, "3": 10, "4": 8, "5": 2 }
+  nfts              NFT[]
+  nftPrivileges     NFTPrivilege[]
+}
+
+// NFTのガチャの結果情報
+model NFTGacha {
+  id          Int              @id @default(autoincrement())
+  superchat   Superchat        @relation(fields: [superchatId], references: [id])
+  superchatId Int
+  created     DateTime         @default(now())
+  nfts        NFTGachaOnNFTs[]
+}
+
+model NFTGachaOnNFTs {
+  nft        NFT      @relation(fields: [nftId], references: [id])
+  nftId      Int
+  nftGacha   NFTGacha @relation(fields: [nftGachaId], references: [id])
+  nftGachaId Int
+  total      Int
+
+  @@id([nftId, nftGachaId])
+}
+
+// NFT特典
+model NFTPrivilege {
+  id                  Int                   @id @default(autoincrement())
+  title               String                @db.VarChar(512)
+  description         String                @db.VarChar(512)
+  expired             DateTime
+  nftCampaign         NFTCampaign?          @relation(fields: [nftCampaignId], references: [id])
+  nftCampaignId       Int?
+  nfts                NFTPrivilegeOnNFTs[]
+  emailBody           String                @db.VarChar(2048)
+  limitExecutionTimes Int
+  nftPrivilegeOnUsers NFTPrivilegeOnUsers[]
+}
+
+// 特典に必要なNFTを結びつける情報
+model NFTPrivilegeOnNFTs {
+  nft            NFT          @relation(fields: [nftId], references: [id])
+  nftId          Int
+  nftPrivilege   NFTPrivilege @relation(fields: [nftPrivilegeId], references: [id])
+  nftPrivilegeId Int
+  required       Int
+
+  @@id([nftId, nftPrivilegeId])
+}
+
+// ユーザと特典および特典回数を結びつける情報
+model NFTPrivilegeOnUsers {
+  user           User         @relation(fields: [userId], references: [id])
+  userId         Int
+  nftPrivilege   NFTPrivilege @relation(fields: [nftPrivilegeId], references: [id])
+  nftPrivilegeId Int
+  executionTimes Int
+
+  @@id([userId, nftPrivilegeId])
+}
+
+// COTの投げ銭によるNFTの配信ステート
+model COTTipNFTDistributionState {
+  targetCosplayer String @id @default(cuid()) @db.VarChar(256) // // 既存のデータあるのでそのままにする
+  targetERC721    String @db.VarChar(256)
+  lowerCOT        String @db.VarChar(256)
+  user            User?  @relation(fields: [userId], references: [id]) // 既存のデータありなのでnullableにしている
+  userId          Int?
+}
+
+// COTの投げ銭によるイベントトリガー済みのCOTTrasnferのTxHash
+model COTTipTriggerdTxHashes {
+  txHash         String  @id @db.VarChar(256)
+  nftDistributed Boolean
+}
+
+// CureCosNFTの配布イベントトリガー済みのTxHash
+model COTTipDistributionTriggerdTxHashes {
+  txHash  String @id @db.VarChar(256)
+  postId  Int
+  photoId Int
+}
+
+// NFT入庫履歴
+model DepositNFTHistory {
+  txHash String @id @db.VarChar(256) // 入庫処理を完遂した txHash
+}

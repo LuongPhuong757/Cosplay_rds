@@ -1,0 +1,154 @@
+<html>
+  <head>
+    <style type="text/css">
+      .ExternalClass,
+      .ExternalClass div,
+      .ExternalClass font,
+      .ExternalClass p,
+      .ExternalClass span,
+      .ExternalClass td,
+      img {
+        line-height: 100%;
+      }
+      #outlook a {
+        padding: 0;
+      }
+      .ExternalClass,
+      .ReadMsgBody {
+        width: 100%;
+      }
+      a,
+      blockquote,
+      body,
+      li,
+      p,
+      table,
+      td {
+        -webkit-text-size-adjust: 100%;
+        -ms-text-size-adjust: 100%;
+      }
+      table,
+      td {
+        mso-table-lspace: 0;
+        mso-table-rspace: 0;
+      }
+      img {
+        -ms-interpolation-mode: bicubic;
+        border: 0;
+        height: auto;
+        outline: 0;
+        text-decoration: none;
+      }
+      table {
+        border-collapse: collapse !important;
+      }
+      #bodyCell,
+      #bodyTable,
+      body {
+        height: 100% !important;
+        margin: 0;
+        padding: 0;
+        font-family: ProximaNova, sans-serif;
+      }
+      #bodyCell {
+        padding: 20px;
+      }
+      #bodyTable {
+        width: 600px;
+      }
+      @font-face {
+        font-family: ProximaNova;
+        src: url(https://cdn.auth0.com/fonts/proxima-nova/proximanova-regular-webfont-webfont.eot);
+        src: url(https://cdn.auth0.com/fonts/proxima-nova/proximanova-regular-webfont-webfont.eot?#iefix)
+            format('embedded-opentype'),
+          url(https://cdn.auth0.com/fonts/proxima-nova/proximanova-regular-webfont-webfont.woff)
+            format('woff');
+        font-weight: 400;
+        font-style: normal;
+      }
+      @font-face {
+        font-family: ProximaNova;
+        src: url(https://cdn.auth0.com/fonts/proxima-nova/proximanova-semibold-webfont-webfont.eot);
+        src: url(https://cdn.auth0.com/fonts/proxima-nova/proximanova-semibold-webfont-webfont.eot?#iefix)
+            format('embedded-opentype'),
+          url(https://cdn.auth0.com/fonts/proxima-nova/proximanova-semibold-webfont-webfont.woff)
+            format('woff');
+        font-weight: 600;
+        font-style: normal;
+      }
+      @media only screen and (max-width: 480px) {
+        #bodyTable,
+        body {
+          width: 100% !important;
+        }
+        a,
+        blockquote,
+        body,
+        li,
+        p,
+        table,
+        td {
+          -webkit-text-size-adjust: none !important;
+        }
+        body {
+          min-width: 100% !important;
+        }
+        #bodyTable {
+          max-width: 600px !important;
+        }
+        #signIn {
+          max-width: 280px !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <span>
+      {% if user.user_metadata.lang == 'ja' %} メールアドレス登録の確認メール {% elsif
+      user.user_metadata.lang == 'zh' or user.user_metadata.lang == 'zh-CN' or
+      user.user_metadata.lang == 'zh-TW' %} 验证您的账号 {% else %} Verify Your Account {% endif %}
+      <br />
+      {% if user.user_metadata.lang == 'ja' %} アカウント情報 {% elsif user.user_metadata.lang ==
+      'zh' or user.user_metadata.lang == 'zh-CN' or user.user_metadata.lang == 'zh-TW' %}
+      您的账户信息 {% else %} Your account information {% endif %}
+    </span>
+    <br />
+    <br />
+
+    <span>
+      {% if user.user_metadata.lang == 'ja' %} メールアドレス {% elsif user.user_metadata.lang ==
+      'zh' or user.user_metadata.lang == 'zh-CN' or user.user_metadata.lang == 'zh-TW' %} 账号 {%
+      else %} Account {% endif %}
+      <br />
+      {{ user.email }}
+    </span>
+    <br />
+    <br />
+
+    <span>
+      {% if user.user_metadata.lang == 'ja' %} 確認用リンク {% elsif user.user_metadata.lang == 'zh'
+      or user.user_metadata.lang == 'zh-CN' or user.user_metadata.lang == 'zh-TW' %} 验证链接 {%
+      else %} Verify Link {% endif %}
+    </span>
+    <br />
+    <a href="{{ url }}">{{ url }}</a>
+    <br />
+    <br />
+
+    <span>
+      {% if user.user_metadata.lang == 'ja' %} ■ このメールに覚えのないお客さま<br />
+      このメールは、Curecosにメールアドレスを登録する際に送信されます。<br />
+      他のお客さまが誤ってメールアドレスを入力し、メールが誤配信された可能性があります。<br />
+      <br />
+      お手数ですが、このメールは破棄していただきますようお願いいたします。<br />
+      なお、メールアドレスの登録にお心当たりがない場合でも、リンクを押下して認証をしない限り、このメールアドレスは登録されませんのでご安心ください。
+      {% elsif user.user_metadata.lang == 'zh' or user.user_metadata.lang == 'zh-CN' or
+      user.user_metadata.lang == 'zh-TW' %} 您的账户信息 <br />
+      如果您有任何有关账户的问题，请回复此邮件和我们联系 {% else %} VERIFY YOUR ACCOUNT
+      <br />
+      If you are having any issues with your account, please don't hesitate to contact us by
+      replying to this mail. <br />
+      Thanks! {% endif %}
+    </span>
+  </body>
+</html>

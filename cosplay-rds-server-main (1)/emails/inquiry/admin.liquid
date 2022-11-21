@@ -1,0 +1,180 @@
+<html>
+<head>
+  <style type="text/css">
+    .ExternalClass,
+    .ExternalClass div,
+    .ExternalClass font,
+    .ExternalClass p,
+    .ExternalClass span,
+    .ExternalClass td,
+    img {
+      line-height: 100%;
+    }
+    #outlook a {
+      padding: 0;
+    }
+    .ExternalClass,
+    .ReadMsgBody {
+      width: 100%;
+    }
+    a,
+    blockquote,
+    body,
+    li,
+    p,
+    table,
+    td {
+      -webkit-text-size-adjust: 100%;
+      -ms-text-size-adjust: 100%;
+    }
+    table,
+    td {
+      mso-table-lspace: 0;
+      mso-table-rspace: 0;
+    }
+    img {
+      -ms-interpolation-mode: bicubic;
+      border: 0;
+      height: auto;
+      outline: 0;
+      text-decoration: none;
+    }
+    table {
+      border-collapse: collapse !important;
+    }
+    #bodyCell,
+    #bodyTable,
+    body {
+      height: 100% !important;
+      margin: 0;
+      padding: 0;
+      font-family: ProximaNova, sans-serif;
+    }
+    #bodyCell {
+      padding: 20px;
+    }
+    #bodyTable {
+      width: 600px;
+    }
+    @font-face {
+      font-family: ProximaNova;
+      src: url(https://cdn.auth0.com/fonts/proxima-nova/proximanova-regular-webfont-webfont.eot);
+      src: url(https://cdn.auth0.com/fonts/proxima-nova/proximanova-regular-webfont-webfont.eot?#iefix)
+      format('embedded-opentype'),
+      url(https://cdn.auth0.com/fonts/proxima-nova/proximanova-regular-webfont-webfont.woff)
+      format('woff');
+      font-weight: 400;
+      font-style: normal;
+    }
+    @font-face {
+      font-family: ProximaNova;
+      src: url(https://cdn.auth0.com/fonts/proxima-nova/proximanova-semibold-webfont-webfont.eot);
+      src: url(https://cdn.auth0.com/fonts/proxima-nova/proximanova-semibold-webfont-webfont.eot?#iefix)
+      format('embedded-opentype'),
+      url(https://cdn.auth0.com/fonts/proxima-nova/proximanova-semibold-webfont-webfont.woff)
+      format('woff');
+      font-weight: 600;
+      font-style: normal;
+    }
+    @media only screen and (max-width: 480px) {
+      #bodyTable,
+      body {
+        width: 100% !important;
+      }
+      a,
+      blockquote,
+      body,
+      li,
+      p,
+      table,
+      td {
+        -webkit-text-size-adjust: none !important;
+      }
+      body {
+        min-width: 100% !important;
+      }
+      #bodyTable {
+        max-width: 600px !important;
+      }
+      #signIn {
+        max-width: 280px !important;
+      }
+    }
+  </style>
+</head>
+<body>
+    <span>
+      {% if lang == 'ja' %} Curecos 問い合わせがありました[{{ time }}] {% else %} Curecos I received an inquiry [{{ time }}] {% endif %}
+      <br />
+      <hr/>
+      <br />
+
+    </span>
+
+    <span>
+        {% if lang == 'ja' %}  問い合わせ時間: {{ time }} {% else %} Contact Time: {{ time }} {% endif %}
+    </span>
+    <br />
+    <br />
+    <span>
+      {% if lang == 'ja' %}
+        お名前：{{ name }}様<br/>
+        メールアドレス：{{ email }}
+      {% else %}
+        Name: {{ name }}<br/>
+        Email Address: {{ email }}{% endif %}
+    </span>
+    <br />
+    <br />
+    <span>
+        IP: {{ userIp }}
+    </span>
+    <br/>
+    <br/>
+    <span>
+      {% if lang == 'ja' %}
+        ユーザーエージェント：{{ userAgent }}
+      {% else %}
+        User Agent: {{ userAgent }}
+      {% endif %}
+    </span>
+    <br/>
+    <br/>
+    <span>
+      {% if lang == 'ja' %}
+        端末：{{ device }}
+      {% else %}
+        Terminal: {{ device }}
+      {% endif %}
+    </span>
+    <br/>
+    <br/>
+    <span>
+      {% if lang == 'ja' %}
+        ログイン情報: {{ userUrl }} <br/>
+      {% else %}
+        Login information:  {{ userUrl }}
+      {% endif %}
+    </span>
+    <br/>
+    <br/>
+    <span>
+      {% if lang == 'ja' %}
+        お問い合わせ内容: <br/>
+        {{ content }}
+      {% else %}
+        Contents of inquiry: <br/>
+        {{ content }}
+      {% endif %}
+    </span>
+    <br/>
+    <br/>
+    <span>
+     ■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□
+     Curecos サポートチーム<br/>
+     Curecos Support Team<br/>
+     E-Mail:support2@curecos.com<br/>
+     ■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□
+    </span>
+</body>
+</html>

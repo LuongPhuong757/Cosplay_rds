@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "NFT" ADD COLUMN     "address" TEXT,
+ALTER COLUMN "tokenID" SET DATA TYPE TEXT;

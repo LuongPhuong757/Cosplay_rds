@@ -1,0 +1,26 @@
+-- CreateTable
+CREATE TABLE "NFTGacha" (
+    "id" SERIAL NOT NULL,
+    "superchatId" INTEGER NOT NULL,
+    "created" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "NFTGachaOnNFTs" (
+    "nftId" INTEGER NOT NULL,
+    "nftGachaId" INTEGER NOT NULL,
+    "total" INTEGER NOT NULL,
+
+    PRIMARY KEY ("nftId","nftGachaId")
+);
+
+-- AddForeignKey
+ALTER TABLE "NFTGacha" ADD FOREIGN KEY ("superchatId") REFERENCES "Superchat"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "NFTGachaOnNFTs" ADD FOREIGN KEY ("nftId") REFERENCES "NFT"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "NFTGachaOnNFTs" ADD FOREIGN KEY ("nftGachaId") REFERENCES "NFTGacha"("id") ON DELETE CASCADE ON UPDATE CASCADE;
